@@ -5,7 +5,6 @@ using namespace sort;
 
 int main(void)
 {
-    // please use "-std=c++11" for this initialization of vector.
 	vector< vector<double> > costMatrix = { { 10, 1.9, 8, 1.5, 0 }, 
 										  { 1.0, 1.8, 7, 1.7, 0 }, 
 										  { 1.3, 1.6, 9, 1.4, 0 }, 

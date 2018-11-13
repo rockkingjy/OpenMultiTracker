@@ -6,6 +6,7 @@
 #include <opencv2/opencv.hpp>
 #include "debug.hpp"
 #include "kalmantracker.hpp"
+#include "sort.hpp"
 
 using namespace std;
 using namespace cv;
@@ -15,7 +16,7 @@ int main(int argc, char **argv)
 {
     // Database settings
     string databaseTypes[3] = {"Demo", "MOT16", "2D_MOT_2015"};
-    string databaseType = databaseTypes[1];
+    string databaseType = databaseTypes[2];
     // Read from the images ====================================================
     int f = 0, fileNow = 1;
     float x, y, w, h, confidence, confidenceThreshhold = 0;
@@ -35,11 +36,11 @@ int main(int argc, char **argv)
         size_t index = 1;
         while (gt >> tmp)
         {
-            if(tmp.find(',')<10)
+            if (tmp.find(',') < 10)
             {
                 break;
             }
-            if (index%4 == 0)
+            if (index % 4 == 0)
             {
             }
             else
@@ -97,7 +98,7 @@ int main(int argc, char **argv)
             f = atof(s.c_str());
         }
         // Read images in a folder
-        osfile << path << "/img1/" << setw(6) << setfill('0') << f << ".jpg";
+        osfile << path << "/img1/" << setw(6) << setfill('0') << fileNow << ".jpg";
         cout << osfile.str() << endl;
     }
     else if (databaseType == "2D_MOT_2015")
@@ -131,7 +132,7 @@ int main(int argc, char **argv)
             f = atof(s.c_str());
         }
         // Read images in a folder
-        osfile << path << "/img1/" << setw(6) << setfill('0') << f << ".jpg";
+        osfile << path << "/img1/" << setw(6) << setfill('0') << fileNow << ".jpg";
         cout << osfile.str() << endl;
     }
 
@@ -154,25 +155,40 @@ int main(int argc, char **argv)
     }
 
     imshow("OpenTracker", frameDraw);
-    waitKey(0);
-
+    //waitKey(0);
+    /*
     // Create KalmanTracker
     cv::Rect2f kalmanbbox;
     KalmanTracker kalmantracker;
     kalmantracker.init(bboxGroundtruth[0], frame.cols, frame.rows);
+*/
+    // Create sort multi tracker;
+    Sort sorttracker;
+    sorttracker.init(frame.cols, frame.rows);
 
     while (frame.data)
     {
+        /*
         // KalmanTracker
         kalmantracker.predict();
         kalmanbbox = kalmantracker.get_state();
         debug("bbox: %f, %f, %f, %f", kalmanbbox.x, kalmanbbox.y, kalmanbbox.width, kalmanbbox.height);
         rectangle(frameDraw, kalmanbbox, Scalar(0, 255, 0), 2, 1);
+*/
+
+        // update sort tracker
+        sorttracker.update(bboxGroundtruth);
+        //sorttracker.print_trackers();
+        vector<sort::KalmanTracker> result = sorttracker.get_trackers();
+        for (unsigned int i = 0; i < result.size(); i++)
+        {
+            rectangle(frameDraw, result[i].get_state(), Scalar(0, 255, 0), 2, 1);
+        }
 
         // Show the image
         imshow("OpenTracker", frameDraw);
 
-        int c = cvWaitKey(0);
+        int c = cvWaitKey(1);
         if (c != -1)
             c = c % 256;
         if (c == 27)
@@ -228,8 +244,8 @@ int main(int argc, char **argv)
                 f = atof(s.c_str());
             }
             // Read images in a folder
-            osfile << path << "/img1/" << setw(6) << setfill('0') << f << ".jpg";
-            cout << osfile.str() << endl;
+            osfile << path << "/img1/" << setw(6) << setfill('0') << fileNow << ".jpg";
+            cout << osfile.str() << "=======================" << endl;
         }
 
         frame = cv::imread(osfile.str().c_str(), CV_LOAD_IMAGE_UNCHANGED);
@@ -250,7 +266,7 @@ int main(int argc, char **argv)
         }
 
         // KalmanTracker update
-        kalmantracker.update(bboxGroundtruth[0]);
+        //        kalmantracker.update(bboxGroundtruth[0]);
     }
     return 0;
 }

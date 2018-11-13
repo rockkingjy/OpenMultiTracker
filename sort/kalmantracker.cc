@@ -14,7 +14,7 @@ void KalmanTracker::init(cv::Rect2f bbox, int width, int height)
     state_ = cv::Mat(stateSize_, 1, type_);  // [u,v,s,r,du,dv,ds]
     measure_ = cv::Mat(measSize_, 1, type_); // [u,v,s,r]
 
-    // state 
+    // state
     state_.at<float>(0) = bbox.x + bbox.width / 2.0f;
     state_.at<float>(1) = bbox.y + bbox.height / 2.0f;
     state_.at<float>(2) = (float)bbox.width * (float)bbox.height;
@@ -62,14 +62,14 @@ void KalmanTracker::init(cv::Rect2f bbox, int width, int height)
 
     // Posteriori error estimate covariance matrix (P(k))
     kf_.errorCovPost.at<float>(0) = 10.0f;
-    kf_.errorCovPost.at<float>(8) = 10.0f; 
+    kf_.errorCovPost.at<float>(8) = 10.0f;
     kf_.errorCovPost.at<float>(16) = 10.0f;
     kf_.errorCovPost.at<float>(24) = 10.0f;
-    kf_.errorCovPost.at<float>(32) = 10000.0f; 
-    kf_.errorCovPost.at<float>(40) = 10000.0f; 
+    kf_.errorCovPost.at<float>(32) = 10000.0f;
+    kf_.errorCovPost.at<float>(40) = 10000.0f;
     kf_.errorCovPost.at<float>(48) = 10000.0f;
 
-    // Process Noise Covariance Matrix Q 
+    // Process Noise Covariance Matrix Q
     kf_.processNoiseCov.at<float>(0) = 1.0f;
     kf_.processNoiseCov.at<float>(8) = 1.0f;
     kf_.processNoiseCov.at<float>(16) = 1.0f;
@@ -96,12 +96,12 @@ void KalmanTracker::update(cv::Rect2f bbox)
 
 void KalmanTracker::predict()
 {
-    if(time_since_update_ > 0)
+    if (time_since_update_ > 0)
     {
         hit_streak_ = 0;
     }
     ++time_since_update_;
-    if(outofbound())
+    if (outofbound())
     {
         state_.at<float>(0) = 0.0f;
         state_.at<float>(1) = 0.0f;
@@ -128,27 +128,31 @@ cv::Rect2f KalmanTracker::get_state()
 bool KalmanTracker::outofbound()
 {
     cv::Rect2f res = get_state();
-    if(res.x + res.width <= 0)
+    if (isnan(res.x) | isnan(res.y) | isnan(res.width) | isnan(res.height))
     {
         return true;
     }
-    if(res.y + res.height <= 0)
-    { 
-        return true;
-    }
-    if(res.x >= image_width_)
+    if (res.x + res.width <= 0)
     {
         return true;
     }
-    if(res.y >= image_height_)
+    if (res.y + res.height <= 0)
     {
         return true;
     }
-    if(res.width <=0)
+    if (res.x >= image_width_)
     {
         return true;
     }
-    if(res.height <= 0)
+    if (res.y >= image_height_)
+    {
+        return true;
+    }
+    if (res.width <= 0)
+    {
+        return true;
+    }
+    if (res.height <= 0)
     {
         return true;
     }

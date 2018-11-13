@@ -4,6 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include "kalmantracker.hpp"
 #include "hungarian.hpp"
 
@@ -14,11 +15,14 @@ namespace sort
 class Sort
 {
 public:
+  void init(int width, int height);
   void init(int max_age, int min_hits, int width, int height);
-  void update(cv::Rect2f bbox);
+  void update(vector<cv::Rect2f> &bbox);
   void associate_detections_to_trackers();
   float iou(cv::Rect2f bbox_gt, cv::Rect2f bb_test);
-  void print_trackers_detections();
+  void print_trackers();
+  void print_detections();
+  inline vector<sort::KalmanTracker> get_trackers() const { return trackers_; }
 
 private:
   int image_width_ = 600;
