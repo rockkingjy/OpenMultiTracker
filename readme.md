@@ -4,10 +4,14 @@
 </p>
 
 # What is OpenMultiTracker?
+OpenMultiTracker is a open sourced repository for Muliple Visual Tracking. It's written in C++, high speed, easy to use, and easy to be implemented in embedded system.
 
+
+<!--
 <p align="center">
     <img src="images/Crossing.gif", width="480">
 </p>
+-->
 
 For Single Object Visual Tracker, check: [OpenTracker](https://github.com/rockkingjy/OpenTracker).
 
