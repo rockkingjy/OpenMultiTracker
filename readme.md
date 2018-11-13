@@ -1,6 +1,6 @@
 
 <p align="center">
-    <img src="images/Openmultitracker.png", width="480">
+    <img src="images/logo.png", width="480">
 </p>
 
 # What is OpenMultiTracker?
